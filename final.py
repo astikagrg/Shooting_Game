@@ -47,6 +47,18 @@ def day():
                   image=bg_image,
                   bg="#2B958E"
                   ).place(x=-3, y=-3)
+            uname=StringVar
+            fn = Entry(
+                signup_fr,
+                text=uname,
+                bg="#21BF99",
+                font=("Arial", 15),
+                bd=0,
+            )
+            fn.place(
+                x=523,
+                y=177,
+            )
 
         def login_c():
             """ Checks the login info from database """
