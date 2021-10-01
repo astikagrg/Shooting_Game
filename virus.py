@@ -3,28 +3,44 @@ import random
 import time
 import sqlite3
 from tkinter import *
-
+global username, password
 root=Tk()
 
 def login():
 
+    global bg_img, psw_img,bt_img
+
     login_fr = LabelFrame(root).place(x=0,y=0)
+
+    bg_img = PhotoImage(file='images/bg.png')
+    bg_img = Label(login_fr, image=bg_img)
+    bg_img.place(x=0, y=0)
+
+    ent_img=PhotoImage(file='images/entry.png')
+    ent_img=Label(login_fr, image=ent_img)
+    ent_img.place(x=276, y=41)
 
     username = StringVar()
     ent = Entry(login_fr, text=username)
-    ent.place(x=100, y=100)
+    ent.place(x=276, y=41)
+
+    psw_img = PhotoImage(file='images/entry.png')
+    pw_img = Label(login_fr, image=psw_img)
+    pw_img.place(x=1045, y=400)
 
     password=StringVar()
     pw_ent=Entry(login_fr, text=password)
-    pw_ent.place(x=120,y=120)
+    pw_ent.place(x=1045,y=400)
 
 
-    global username
+
 
     def btn_click():
         global username
 
-
+    bt_img = PhotoImage(file='images/play.png')
+    btn_img = Label(login_fr, image=bt_img)
+    btn_img.place(x=276, y=41)
 
     but = Button(login_fr, text='confirm', command=btn_click).place(x=120, y=120)
 
@@ -41,7 +57,7 @@ def signup():
     ent.place(x=120, y=120)
 
 
-    global username, password
+
 
     def btn_click():
         global username
@@ -110,7 +126,7 @@ def game():
 
 
     def score_board(score):
-        global score
+
         font = pygame.font.Font('freesansbold.ttf', 35)
         text = font.render('Score ' + str(score), True,  (255, 255, 2550))
         wn.blit(text, (5, 10))
@@ -215,3 +231,5 @@ def game():
     game_loop()
     pygame.quit()
     quit()
+
+login()
