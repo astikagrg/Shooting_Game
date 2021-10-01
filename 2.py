@@ -1,370 +1,171 @@
 import pygame
-import sys
+import time
 import random
+import sqlite3
 
-""" Objects """
+# Initiate pygame. Always needed
 
 
-class Player(pygame.sprite.Sprite):
-    """ inherites from Sprite class """
-
-    def __init__(self):
-        super().__init__()
-
-        # horizontal clearance
-        self.hc = 64
-
-        # vertical clearance
-        self.vc = 32
-
-        # speed
-        self.speed = 0
-
-        # amount of pixels to be moved
-        self.amount = 5
-
-        # current frame
-        self.frame = 0
-
-        # crash status
-        self.crash = False
-
-        # explode status
-        self.explode = False
-
-        # font
-        self.font = pygame.font.SysFont('FixedSys', 32)
-
-        # score
-        self.score = 0
-
-        # boom images
-        self.sprites = []
-        self.sprites.append(pygame.image.load('explosion1.png'))
-        self.sprites.append(pygame.image.load('explosion2.png'))
-        self.sprites.append(pygame.image.load('explosion3.png'))
-        self.sprites.append(pygame.image.load('explosion4.png'))
-        self.sprites.append(pygame.image.load('explosion5.png'))
-        self.sprites.append(pygame.image.load('explosion6.png'))
-        self.sprites.append(pygame.image.load('explosion7.png'))
-        self.sprites.append(pygame.image.load('explosion8.png'))
-        self.sprites.append(pygame.image.load('explosion9.png'))
-        self.sprites.append(pygame.image.load('explosion10.png'))
-        self.sprites.append(pygame.image.load('explosion11.png'))
-        self.sprites.append(pygame.image.load('explosion12.png'))
-
-        # spaceship image
-        self.image = pygame.image.load("ship.png")
-        self.rect = self.image.get_rect(center=(self.hc, H / 2))
-
-        self.orig = pygame.image.load("ship.png")
-
-        # sound
-        self.laser = pygame.mixer.Sound('laser.wav')
-        self.blast = pygame.mixer.Sound('blast.wav')
-
-    def update(self, bullets):
-        self.crash = self.check(bullets)
-
-        text = str(self.score)
-        color = (255, 255, 255)
-        pos = (544, 16)
-        screen.blit(self.font.render(text, True, color), pos)
-
-        if self.crash:
-            self.explode = True
-
-        if self.explode:
-            # stop moving
-            self.speed = 0
-
-            if self.frame >= len(self.sprites):
-                # reset to initial frame
-                self.frame = int(0)
-
-                # play blast if explosion begins
-                if self.frame == 0:
-                    self.blast.play()
-
-                # reset to original image
-                self.image = self.orig
-                x = self.rect.centerx
-                y = self.rect.centery
-                self.rect = self.image.get_rect(center=(x, y))
-
-                # stop explosion
-                self.explode = False
-
-                # give one point to the opponent
-                self.score += 1
-            else:
-                self.image = self.sprites[int(self.frame)]
-
-            self.frame += 0.25
-
-        else:
-            self.move()
-
-    def move(self):
-        self.rect.centery += self.speed
-
-        if self.rect.top <= self.vc:
-            self.rect.top = self.vc
-
-        if self.rect.bottom >= H - self.vc:
-            self.rect.bottom = H - self.vc
-
-    def check(self, bullets):
-        for bullet in bullets:
-            if self.rect.colliderect(bullet.rect):
-                return True
-
-    def shoot(self):
-        self.laser.play()
-        return Bullet(self)
-
-
-class Enemy(pygame.sprite.Sprite):
-    """ inherites from Sprite class """
-
-    def __init__(self):
-        super().__init__()
-
-        # horizontal clearance
-        self.hc = 64
-
-        # vertical clearance
-        self.vc = 32
-
-        # amount of pixels to be moved
-        self.amount = 7
-
-        # speed
-        self.speed = self.amount
-
-        # shoot interval
-        self.dt = 50
-
-        # current frame
-        self.frame = 0
-
-        # crash status
-        self.crash = False
-
-        # explode status
-        self.explode = False
-
-        # font
-        self.font = pygame.font.SysFont('FixedSys', 32)
-
-        # score
-        self.score = 0
-
-        # boom images
-        self.sprites = []
-        self.sprites.append(pygame.image.load('explosion1.png'))
-        self.sprites.append(pygame.image.load('explosion2.png'))
-        self.sprites.append(pygame.image.load('explosion3.png'))
-        self.sprites.append(pygame.image.load('explosion4.png'))
-        self.sprites.append(pygame.image.load('explosion5.png'))
-        self.sprites.append(pygame.image.load('explosion6.png'))
-        self.sprites.append(pygame.image.load('explosion7.png'))
-        self.sprites.append(pygame.image.load('explosion8.png'))
-        self.sprites.append(pygame.image.load('explosion9.png'))
-        self.sprites.append(pygame.image.load('explosion10.png'))
-        self.sprites.append(pygame.image.load('explosion11.png'))
-        self.sprites.append(pygame.image.load('explosion12.png'))
-
-        # spaceship image
-        self.image = pygame.image.load("ship.png")
-        self.image = pygame.transform.flip(self.image, 0, 1)
-        self.rect = self.image.get_rect(center=(W - self.hc, H / 2))
-
-        self.orig = pygame.image.load("ship.png")
-        self.orig = pygame.transform.flip(self.orig, 0, 1)
-
-        # sound
-        self.laser = pygame.mixer.Sound('laser.wav')
-        self.blast = pygame.mixer.Sound('blast.wav')
-
-    def update(self, bullets):
-        self.crash = self.check(bullets)
-
-        text = str(self.score)
-        color = (255, 255, 255)
-        pos = (480, 16)
-        screen.blit(self.font.render(text, True, color), pos)
-
-        if self.crash:
-            self.explode = True
-
-        if self.explode:
-            # stop moving
-            self.speed = 0
-
-            if self.frame >= len(self.sprites):
-                # reset to initial frame
-                self.frame = int(0)
-
-                # play blast if explosion begins
-                if self.frame == 0:
-                    self.blast.play()
-
-                # shift to original image
-                self.image = self.orig
-                x = self.rect.centerx
-                y = self.rect.centery
-                self.rect = self.image.get_rect(center=(x, y))
-
-                # stop explosion
-                self.explode = False
-
-                # reset movement
-                self.speed = self.amount
-
-                # give one point to the opponent
-                self.score += 1
-            else:
-                self.image = self.sprites[int(self.frame)]
-
-            self.frame += 0.25
-
-        else:
-            self.move()
-
-    def move(self):
-        self.rect.centery += self.speed
-
-        if self.rect.top <= self.vc or self.rect.bottom >= H - self.vc:
-            self.speed *= -1
-
-    def check(self, bullets):
-        for bullet in bullets:
-            if self.rect.colliderect(bullet.rect):
-                return True
-
-    def shoot(self, ticks):
-        if self.explode:
-            return None
-        if not ticks % self.dt:
-            if random.choice((1, 0)):
-                self.laser.play()
-                return Bullet(self)
-
-
-class Bullet(pygame.sprite.Sprite):
-    """ inherits from Sprite class """
-
-    def __init__(self, player):
-        super().__init__()
-
-        # player from which the bullet is shot
-        self.player = player
-
-        if isinstance(player, Player):
-            self.image = pygame.image.load("yellow_laser.png")
-            x = player.rect.midright[0]
-            y = player.rect.midright[1]
-            self.rect = self.image.get_rect(center=(x, y))
-
-        if isinstance(player, Enemy):
-            self.image = pygame.image.load("red_laser.png")
-            x = player.rect.midleft[0]
-            y = player.rect.midleft[1]
-            self.rect = self.image.get_rect(center=(x, y))
-
-    def update(self):
-        if isinstance(self.player, Player):
-            self.rect.x += 5
-        if isinstance(self.player, Enemy):
-            self.rect.x -= 5
-        self.destroy()
-
-    def destroy(self):
-        if isinstance(self.player, Player):
-            if self.rect.x >= W - 16:
-                self.kill()
-        if isinstance(self.player, Enemy):
-            if self.rect.x <= 16:
-                self.kill()
-
-
-""" Settings """
-pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
-pygame.mouse.set_visible(False)
+
+# Clock
 clock = pygame.time.Clock()
 
-W, H = 1024, 512
-screen = pygame.display.set_mode((W, H))
+# RGB Color
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
 
-""" Sprites """
-player = Player()
-playerGroup = pygame.sprite.Group()
-playerGroup.add(player)
+# window with size of 500 x 400 pixels
+wn_width = 800
+wn_height = 600
+wn = pygame.display.set_mode((wn_width, wn_height))
+pygame.display.set_caption('F1 Road Block')
 
-enemy = Enemy()
-enemyGroup = pygame.sprite.Group()
-enemyGroup.add(enemy)
+# image
+bg = pygame.image.load('images/road.png')
+carimg = pygame.image.load('images/F1.png')
 
-yellowBulletGroup = pygame.sprite.Group()
-redBulletGroup = pygame.sprite.Group()
+# Boundaries
+west_b = 132
+east_b = 700
 
-""" Main Loop """
-while 1:
+# Database sqLite3
+"""
+conn = sqlite3.connect("Dodge.db")
+c = conn.cursor()
 
-    # Event handler
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        if event.type == pygame.KEYDOWN:
-            # QUIT
-            if event.key == pygame.K_ESCAPE:
+c.execute(
+         CREATE TABLE IF NOT EXISTS block(
+             score_results int,
+       )
+)
+#conn.commit()
+#conn.close()
+"""
+
+class Block:
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.speedy = 5
+        self.dodged = 0
+
+    def update(self):
+        self.y = self.y + self.speedy
+        # check boundary (block)
+        if self.y > wn_height:
+            self.y = 0 - self.height
+            self.x = random.randrange(west_b, east_b - self.width)
+            self.dodged = self.dodged + 1
+
+    def draw(self, wn):
+        pygame.draw.rect(wn, RED, [self.x, self.y, self.width, self.height])
+
+
+class Player:
+    def __init__(self):
+        self.image = carimg
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
+
+        self.rect = self.image.get_rect()
+        self.rect.x = int(wn_width * 0.5)
+        self.rect.y = int(wn_height * 0.5)
+
+        self.speedx = 0
+
+    def update(self):
+        keystate = pygame.key.get_pressed()
+        if keystate[pygame.K_LEFT]:
+            self.speedx = -10
+        if keystate[pygame.K_RIGHT]:
+            self.speedx = 10
+
+        self.rect.x = self.rect.x + self.speedx
+
+        # check boundary (west)
+        if self.rect.left < west_b:
+            self.rect.left = west_b
+        # check boundary (east)
+        if self.rect.right > east_b:
+            self.rect.right = east_b
+
+
+# Functions
+def score_board(dodged):
+    global dodged_result
+
+    font = pygame.font.Font(None, 25)
+    text = font.render('Dodged: ' + str(dodged), True, BLACK)
+    dodged_result=dodged
+    wn.blit(text, (0, 0))
+
+
+def crash():
+    global dodged_result
+    font = pygame.font.Font(None, 80)
+    text = font.render('YOU CRASHED!', True, BLACK)
+    text_width = text.get_width()
+    text_height = text.get_height()
+    x = int(wn_width / 2 - text_width / 2)
+    y = int(wn_height / 2 - text_height / 2)
+    wn.blit(text, (x, y))
+    pygame.display.update()
+    time.sleep(2)
+
+    conn = sqlite3.connect("Dodge.db")
+    c = conn.cursor()
+    c.execute(
+        "INSERT INTO block VALUES (:score_results)",
+        {
+            "score_results": dodged_result
+        },
+    )
+
+    conn.commit()
+    conn.close()
+
+
+# def game function
+def game_loop():
+
+    block_width = 80
+    block_height = 20
+    block_x = random.randrange(west_b, east_b - block_width)
+    block_y = -100
+
+    player = Player()
+    block = Block(block_x, block_y, block_width, block_height)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 pygame.quit()
-                sys.exit()
-            # UP
-            if event.key == pygame.K_w:
-                player.speed -= player.amount
-            # DOWN
-            if event.key == pygame.K_s:
-                player.speed += player.amount
-            # SHOOT
-            if event.key == pygame.K_SPACE:
-                yellowBullet = player.shoot()
-                yellowBulletGroup.add(yellowBullet)
-        if event.type == pygame.KEYUP:
-            # UP
-            if event.key == pygame.K_w:
-                player.speed = 0
-            # DOWN
-            if event.key == pygame.K_s:
-                player.speed = 0
+                quit()
 
-    # Drawing
-    screen.fill((30, 30, 30))
+        player.update()
+        block.update()
 
-    # Player update
-    playerGroup.draw(screen)
-    playerGroup.update(redBulletGroup)
+        wn.blit(bg, (0, 0))  # (0,0)location on the wn
+        wn.blit(player.image, (player.rect.x, player.rect.y))
+        block.draw(wn)
 
-    # Enemy shoots
-    redBullet = enemy.shoot(pygame.time.get_ticks())
-    if redBullet == None:
-        pass
-    else:
-        redBulletGroup.add(redBullet)
+        # Car collision with block
+        if player.rect.right > block.x and player.rect.x < block.x + block.width:
+            if block.y + block.height > player.rect.y and block.y < player.rect.bottom:
+                crash()
 
-    # Enemy update
-    enemyGroup.draw(screen)
-    enemyGroup.update(yellowBulletGroup)
+        # Score
+        score_board(block.dodged)
+        pygame.display.update()
 
-    # Bullets update
-    yellowBulletGroup.draw(screen)
-    yellowBulletGroup.update()
+        clock.tick(60)
 
-    redBulletGroup.draw(screen)
-    redBulletGroup.update()
+    # pygame.quit
 
-    pygame.display.flip()
-    clock.tick(60)
+
+game_loop()
+pygame.quit()
+quit()
