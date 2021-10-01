@@ -3,89 +3,121 @@ import random
 import time
 import sqlite3
 from tkinter import *
+
 global username, password
+#creating a window
 root=Tk()
+root.geometry('800x600')
+root.resizable(False,False)
 
 def login():
 
-    global bg_img, psw_img,bt_img
-
+    global bgimg, psw_img,bt_img
     login_fr = LabelFrame(root).place(x=0,y=0)
-
-    bg_img = PhotoImage(file='images/bg.png')
-    bg_img = Label(login_fr, image=bg_img)
+    #background image
+    bgimg = PhotoImage(file='images/bg.png')
+    bg_img = Label(login_fr, image=bgimg)
     bg_img.place(x=0, y=0)
 
-    ent_img=PhotoImage(file='images/entry.png')
-    ent_img=Label(login_fr, image=ent_img)
-    ent_img.place(x=276, y=41)
+    # box image place
+    boximg = PhotoImage(file='images/box.PNG')
+    box_img = Label(login_fr, image=boximg, bg='#030303', bd=0)
+    box_img.place(x=179, y=108)
+
+    # username entry
+    en_img=PhotoImage(file='images/entry.png')
+    ent_img=Label(login_fr, image=en_img)
+    ent_img.place(x=240, y=131)
 
     username = StringVar()
     ent = Entry(login_fr, text=username)
-    ent.place(x=276, y=41)
+    ent.place(x=240, y=131)
 
+    #password entry
     psw_img = PhotoImage(file='images/entry.png')
     pw_img = Label(login_fr, image=psw_img)
-    pw_img.place(x=1045, y=400)
+    pw_img.place(x=240, y=220)
 
     password=StringVar()
     pw_ent=Entry(login_fr, text=password)
-    pw_ent.place(x=1045,y=400)
-
-
+    pw_ent.place(x=240,y=220)
 
 
     def btn_click():
         global username
 
     bt_img = PhotoImage(file='images/play.png')
-    btn_img = Label(login_fr, image=bt_img)
-    btn_img.place(x=276, y=41)
-
-    but = Button(login_fr, text='confirm', command=btn_click).place(x=120, y=120)
+    but = Button(login_fr, command=btn_click, image=bt_img).place(x=294, y=309)
 
 def signup():
 
+    global bgimg, en_img, psw_img, bt_img,boximg
 
     signup_fr = LabelFrame(root).place(x=0,y=0)
+
+# Background image entry
+    bgimg = PhotoImage(file='images/bg.PNG')
+    bg_img = Label(signup_fr, image=bgimg, bg='#FFBF3B', bd=0)
+    bg_img.place(x=0, y=0)
+
+#box image place
+    boximg = PhotoImage(file='images/box.PNG')
+    box_img = Label(signup_fr, image=boximg, bg='#030303', bd=0)
+    box_img.place(x=179, y=108)
+
+#username entry
+    en_img = PhotoImage(file='images/entry.png')
+    ent_img = Label(signup_fr, image=en_img,bg='#030303',fg="#FFBF3B", bd=0)
+    ent_img.place(x=240, y=131)
+
     username = StringVar()
-    ent = Entry(signup_fr, text=username)
-    ent.place(x=100, y=100)
+    username.set('Username')
+    ent = Entry(signup_fr, text=username, bg='#FFBF3B',fg="#030303", bd=0, font=("Arial", 15))
+    ent.place(x=250, y=141)
+#password entry
+
+    psw_img = PhotoImage(file='images/entry.png')
+    pw_img = Label(signup_fr, image=psw_img,  bg='#030303', fg="#FFBF3B", bd=0)
+    pw_img.place(x=240, y=220)
 
     password = StringVar()
-    pw_ent = Entry(signup_fr, text=password)
-    ent.place(x=120, y=120)
+    password.set('Password')
+    pw_ent = Entry(signup_fr, text=password,  bg='#FFBF3B',fg="#030303", bd=0, font=("Arial", 15))
+    pw_ent.place(x=250, y=230)
+
+    bt_img = PhotoImage(file='images/done.png')
 
 
 
 
-    def btn_click():
-        global username
-        user_info = sqlite3.connect("Score.db")
-        c = user_info.cursor()
-        c.execute(
-            '''CREATE TABLE IF NOT EXISTS user_score(
-            username text,
-            score integer,
-            password integer,
-            
-            )'''
-        )
-        c.commit()
 
-        c.execute(
-            '''INSERT INTO user_score VALUES (:username,:score, :password)''',
-            {
-                "username": username.get(),
-                "score": 0,
-                "password":password.get(),
+    def done_click():
+            global username
+            user_info = sqlite3.connect("Score.db")
+            c = user_info.cursor()
+            c.execute(
+                '''CREATE TABLE IF NOT EXISTS user_score(
+                username text,
+                score integer,
+                password integer,
+                
+                )'''
+            )
+            c.commit()
 
-            },
+            c.execute(
+                '''INSERT INTO user_score VALUES (:username,:score, :password)''',
+                {
+                    "username": username.get(),
+                    "score": 0,
+                    "password":password.get(),
 
-        )
-        c.commit()
+                },
 
-    but= Button(signup_fr, text='confirm', command=btn_click).place(x=120, y=120)
+            )
+            c.commit()
+
+    but= Button(signup_fr, text='confirm', command=done_click, image=bt_img,  bg='#030303', bd=0).place(x=289, y=279)
 def game():
     # General setup
     pygame.init()
@@ -232,4 +264,6 @@ def game():
     pygame.quit()
     quit()
 
-login()
+signup()
+
+root.mainloop()
