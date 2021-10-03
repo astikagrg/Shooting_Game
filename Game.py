@@ -49,7 +49,7 @@ def game():
     conn.close()
 
     def score_board(score):
-
+        global usernam1
         font = pygame.font.Font('freesansbold.ttf', 35)
         text = font.render('Score ' + str(score), True, (255, 255, 255))
         wn.blit(text, (5, 10))
@@ -78,7 +78,7 @@ def game():
             self.speedx = random.randrange(-1, 2)
 
         def update(self):
-            global score
+            global score, usernam1
             self.rect.x = self.rect.x + self.speedx
             self.rect.y = self.rect.y + self.speedy
 
@@ -98,8 +98,29 @@ def game():
                 db = sqlite3.connect("Score.db")
                 c = db.cursor()
                 c.execute(
-                    '''SELECT FROM user_score WHERE '''
+                    f'''SELECT * FROM user_score WHERE :usernam={usernam1}'''
+                )
+                d=c.fetchall()
+                e=d[0]
+                e_0=e[0]
+                e_1=e[1]
+                e_2=e[2]
+                c.execute(f''' DElETE FROM user_score WHERE :usernam={usernam1}''')
+                db.commit()
+                if score>e_1 :
+                    e_1=score
 
+                c.execute(
+                    'INSERT INTO user_score VALUES (:usernam,:score, :password)',
+                    {
+                        "usernam":e_0,
+                        "score": e_1,
+                        "password": e_2
+
+                    },
+
+                )
+                db.commit()
 
     def game_loop():
         # Player
@@ -161,15 +182,27 @@ def signup():
     box_img = Label(signup_fr, image=boximg, bg='#030303', bd=0)
     box_img.place(x=179, y=108)
 
+
+    def clear_entry(events):
+        """ remove placeholder after selection"""
+
+        if usernam.get() == "Username":
+            usernam.set("")
+
+
+
     # username entry
     en_img = PhotoImage(file='images/entry.png')
     ent_img = Label(signup_fr, image=en_img, bg='#030303', fg="#FFBF3B", bd=0)
     ent_img.place(x=240, y=131)
 
+
     usernam = StringVar()
     usernam.set('Username')
     ent = Entry(signup_fr, text=usernam, bg='#FFBF3B', fg="#030303", bd=0, font=("Arial", 15))
     ent.place(x=250, y=141)
+    ent.bind("<Button-1>", clear_entry)
+
 
     # password entry
 
@@ -215,35 +248,12 @@ def signup():
 
 
 def login():
-    global bgimg, en_img, psw_img, bt_img, bt_img2, password1
+    global bgimg, en_img, psw_img, bt_img, bt_img2, usernam1
     login_fr = LabelFrame(root).place(x=0, y=0)
     # background image
     bgimg = PhotoImage(file='images/bg.png')
     bg_img = Label(login_fr, image=bgimg)
     bg_img.place(x=0, y=0)
-
-    # box image place
-    boximg = PhotoImage(file='images/rectanglelogin.PNG')
-    box_img = Label(login_fr, image=boximg, bg='#030303', bd=0)
-    box_img.place(x=179, y=108)
-
-    # username entry
-    en_img = PhotoImage(file='images/loginentry.png')
-    ent_img = Label(login_fr, image=en_img, bg='#030303', bd=0)
-    ent_img.place(x=240, y=131)
-
-    usernam1 = StringVar()
-    ent = Entry(login_fr, text=usernam1, bg='#FFBF3B', fg="#030303", bd=0, font=("Arial", 15))
-    ent.place(x=260, y=147)
-
-    # password entry
-    psw_img = PhotoImage(file='images/loginentry.png')
-    pw_img = Label(login_fr, image=psw_img, bg='#030303', bd=0)
-    pw_img.place(x=240, y=220)
-
-    password1 = StringVar()
-    pw_ent = Entry(login_fr, text=password1, bg='#FFBF3B', fg="#030303", bd=0, font=("Arial", 15))
-    pw_ent.place(x=250, y=230)
 
     def play_click():
         user_info = sqlite3.connect("Score.db")
@@ -262,8 +272,8 @@ def login():
                 valid1 = True
                 if password1.get() == g[2]:
                     valid2 = True
-            print (usernam1.get(), password1.get(), g[0], g[2])
-        if valid1 is True and valid2 is False :
+            print(usernam1.get(), password1.get(), g[0], g[2])
+        if valid1 is True and valid2 is False:
             print("Invalid Passsword")
 
         elif valid1 is False:
@@ -272,13 +282,50 @@ def login():
         else:
             print('Done')
             game()
+
+    # box image place
+    boximg = PhotoImage(file='images/rectanglelogin.PNG')
+    box_img = Label(login_fr, image=boximg, bg='#030303', bd=0)
+    box_img.place(x=179, y=108)
+
+    # username entry
+    en_img = PhotoImage(file='images/loginentry.png')
+    ent_img = Label(login_fr, image=en_img, bg='#030303', bd=0)
+    ent_img.place(x=240, y=131)
+
+
+    def clear_entry(events):
+        """ remove placeholder after selection"""
+
+        if usernam1.get() == "Username":
+            usernam1.set("")
+    def vari():
+        global usernam1
+        usernam1_1=usernam1
+
+
+    usernam1 = StringVar()
+    usernam1.set('Username')
+    ent = Entry(login_fr, text=usernam1, bg='#FFBF3B', fg="#030303", bd=0, font=("Arial", 15))
+    ent.place(x=260, y=147)
+    ent.bind("<Button-1>", clear_entry)
+
+    # password entry
+    psw_img = PhotoImage(file='images/loginentry.png')
+    pw_img = Label(login_fr, image=psw_img, bg='#030303', bd=0)
+    pw_img.place(x=240, y=220)
+
+    password1 = StringVar()
+    pw_ent = Entry(login_fr, text=password1, bg='#FFBF3B', fg="#030303", bd=0, font=("Arial", 15))
+    pw_ent.place(x=250, y=230)
+
     bt_img = PhotoImage(file='images/play.png')
     but = Button(login_fr, command=play_click, image=bt_img, bg='#000000', bd=0).place(x=294, y=309)
 
     bt_img2 = PhotoImage(file='images/Signup.png')
     but2 = Button(login_fr, command=signup, image=bt_img2, bg='#000000', bd=0).place(x=480, y=378)
 
-
+    vari()
 login()
 
 root.mainloop()
