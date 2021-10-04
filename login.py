@@ -7,6 +7,8 @@ from tkinter import *
 global username, password
 #creating a window
 root=Tk()
+root.title('Shooting Game')
+root.iconbitmap('images/icon.ico')
 root.geometry('800x600')
 root.resizable(False,False)
 

@@ -23,8 +23,16 @@ or touchpad. Its simplicity makes it a fun game for all.
 <h3> Screenshots of the game </h3>
 
 <h4> Signup Page </h4>
+<img  src = "https://i.imgur.com/MtGm8tH.png" >
 <h4>Login Page</h4>
+<img  src = "https://i.imgur.com/4owtqTD.png" >
+<h4>Modes</h4>
+<img  src = "https://i.imgur.com/3t8bqS7.png" >
 <h4>The Game</h4>
+<img  src = "https://i.imgur.com/CcOkMMV.png" >
+<h4>Game Over</h4>
+<img  src = "https://i.imgur.com/xDjGEVb.png" >
+
 
 
 <h3>Tools Used</h3>
@@ -34,6 +42,12 @@ or touchpad. Its simplicity makes it a fun game for all.
 - Tkinter
 - SQLite3
 - Figma
+
+<h3>Testing</h3>
+<p> Unit testing was done in the login page as well as the highsscore page. The screen shot
+of the unit testing of login page is shown below</p>
+<img  src = "https://i.imgur.com/AllUIN6.png" >
+
 
 <h3> Contact Details</h3>
 <p>
