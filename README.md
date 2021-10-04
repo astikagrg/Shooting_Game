@@ -34,7 +34,6 @@ or touchpad. Its simplicity makes it a fun game for all.
 - Tkinter
 - SQLite3
 - Figma
-- Microsoft word
 
 <h3> Contact Details</h3>
 <p>
